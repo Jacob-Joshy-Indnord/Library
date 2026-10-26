@@ -20,3 +20,15 @@ class ReservationOut(BaseModel):
     pickup_day: date
     status: ReservationStatus
     created_at: datetime
+
+
+class WaitlistJoin(BaseModel):
+    member_id: int
+
+
+class WaitlistEntryOut(BaseModel):
+    id: int
+    tool_id: int
+    member_id: int
+    position: int
+    created_at: datetime

@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime, timezone
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -50,6 +50,20 @@ class Reservation(Base):
     status: Mapped[ReservationStatus] = mapped_column(
         _enum(ReservationStatus), default=ReservationStatus.ACTIVE
     )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+
+class WaitlistEntry(Base):
+    """A member queued for a tool that is On loan; FIFO order is by ``id``."""
+
+    __tablename__ = "waitlist_entries"
+    __table_args__ = (UniqueConstraint("tool_id", "member_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tool_id: Mapped[int] = mapped_column(ForeignKey("tools.id"), index=True)
+    member_id: Mapped[int] = mapped_column(ForeignKey("members.id"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
